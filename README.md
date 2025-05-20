@@ -9,4 +9,13 @@ This code is owned by Microsoft and licensed under the MS-LPL.  See the LICENSE 
 ## Changes from the Nerdhile version:
 - .Net classes have changed vastly since originally written. The corrected/update names of the classes and packages needed to be located, then code changed to download them as needed.
 
-See article: 
+## See Article:
+
+
+## For Use Instructions:
+Look at the code itself. There are many comments from the original authors explaining how to use the script.
+
+To give one example, this is a modern way to use the tool...
+```
+.\Convert-WindowsImage.ps1 -SourcePath "C:\Hyper-V\WIM\Win_11_24H2.wim" -VHDPath "C:\Hyper-V\Templates\Win11_24H2_test.vhdx" -Edition 1 -VHDFormat VHDX -VHDPartitionStyle GPT -VHDType dynamic -SizeBytes  128GB
+```
