@@ -1,4 +1,6 @@
-﻿  <#
+#Requires -Version 7.0
+<#
+
     .NOTES
         Copyright (c) Microsoft Corporation.  All rights reserved.
 
@@ -9,12 +11,23 @@
         please see the license agreement between you and Microsoft or, if applicable,
         see the LICENSE.RTF on your install media or the root of your tools installation.
         THE SAMPLE SOURCE CODE IS PROVIDED "AS IS", WITH NO WARRANTIES.
+
+
+    Original script by Microsoft.
+
+    Updates performed by Nerdile: https://github.com/nerdile/convert-windowsimage
+
+    Updated by Max Allen (AzureToTheMax) to account for PowerShell 7 and changes to .Net Classes.
+    See article: 
+    Contact:    AzureToTheMax.Net, AzureToTheMax on Discord
+    Updated:    5/20/25
+    Website:    AzureToTheMax.Net
     
     .SYNOPSIS
-        Creates a bootable VHD(X) based on Windows 7 or Windows 8 installation media.
+        Creates a bootable VHD(X) based on Windows 10/11 installation media (WIM or ISO).
 
     .DESCRIPTION
-        Creates a bootable VHD(X) based on Windows 7 or Windows 8 installation media.
+        Creates a bootable VHD(X) based on Windows 10/11 installation media (WIM or ISO).
 
     .PARAMETER SourcePath
         The complete path to the WIM or ISO file that will be converted to a Virtual Hard Disk.
@@ -2880,6 +2893,42 @@ namespace WIM2VHD {
 
                 Consider this a TODO for future versions.
             #>
+
+            Function Check-Package {
+                # Author: Max Allen, AzureToTheMax
+                # This Function checks for required .Net Assemblies and adds them if needed as these are now handled via Nuget, not installing .Net XYZ.
+                
+                param(
+                [Parameter(Mandatory = $true, ValueFromPipeline = $true, Position = 0)]
+                [ValidateNotNullOrEmpty()]
+                $Package
+                )
+
+                #For each package in our $package array...
+                ForEach ($SinglePackage in $Package) {
+                
+                    # Why am I running PS 7.0 and not getting the get-package command?
+                    # Import-Module -name "C:\Program Files\PowerShell\7\Modules\PackageManagement" -Verbose
+                    # Somehow, just restarting VSC for the 3rd time fixed this????
+                
+                    #Check if the pacakge is installed
+                    $CheckPackage = Get-Package $SinglePackage -Destination ".\Packages" -ErrorAction SilentlyContinue
+
+                    if ($CheckPackage -notlike "*No package found for*"){
+                        #If yes, good
+                        Write-Host "Required package $($SinglePackage) is installed." -ForegroundColor Green
+                    } else {
+                        #If not, try and install it. 
+                        Write-Host "Required package $($SinglePackage) not installed, installing." -ForegroundColor Yellow
+                        #ignore the errors from it already being present.
+                        Install-Package $SinglePackage -Force -Destination ".\Packages" -ErrorAction SilentlyContinue 
+                    }
+
+                }
+            }
+
+
+            ##########################################################################################
             Function Mount-RegistryHive {
                 [CmdletBinding()]
                 param(
@@ -3281,7 +3330,41 @@ namespace WIM2VHD {
                     $transcripting = $false
                 }
 
-                Add-Type -TypeDefinition $code -ReferencedAssemblies "System.Xml","System.Linq","System.Xml.Linq"
+                # Max Allen Was Here, AzureToTheMax
+                # Required Namespace's stolen from just under $Code then updated when errors still came out (changed names, etc)
+                $RequiredPackages = @(
+                'System.ComponentModel',
+                'System.Globalization',
+                'System.IO',
+                'System.Linq',
+                'System.Runtime.InteropServices',
+                'System.Text.RegularExpressions',
+                'System.Threading',
+                'System.Xml.Linq',
+                'System.Xml.XPath',
+                'Microsoft.Extensions.Primitives'
+                )
+                 
+
+                # Check that our packages are installed, or install them
+                Check-Package -Package $RequiredPackages
+
+
+                # Thank you to Travis Parks
+                # Add our packages/classes from our locally installed copies resulting from the above function call
+                Get-ChildItem .\packages\ -Recurse -Filter "*.dll" | % {
+                    try
+                    {
+                        write-host "Importing package $($_.FullName)" -ForegroundColor Green
+                        Add-Type -Path $_.FullName
+                        }
+                        catch [System.Exception]
+                        {
+                    }
+                }
+
+                # Now we can safely add our types without risk of all of these packages not being installed
+                Add-Type -TypeDefinition $code
 
                 # Check to make sure we're running as Admin.
                 if (!(Test-Admin)) {
@@ -4557,5 +4640,3 @@ format fs=fat32 label="System"
         }
 
    #endregion Code
-
-
