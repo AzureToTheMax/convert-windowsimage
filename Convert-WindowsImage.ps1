@@ -17,7 +17,7 @@
 
     Updates performed by Nerdile: https://github.com/nerdile/convert-windowsimage
 
-    Updated by Max Allen (AzureToTheMax) to account for PowerShell 7 and changes to .Net Classes.
+    Updated by Max Allen (AzureToTheMax) to account for PowerShell 7 and changes to .Net assemblies.
     See article: 
     Contact:    AzureToTheMax.Net, AzureToTheMax on Discord
     Updated:    5/20/25
@@ -3351,7 +3351,7 @@ namespace WIM2VHD {
 
 
                 # Thank you to Travis Parks
-                # Add our packages/classes from our locally installed copies resulting from the above function call
+                # Add our packages/assemblies from our locally installed copies resulting from the above function call
                 Get-ChildItem .\packages\ -Recurse -Filter "*.dll" | % {
                     try
                     {
