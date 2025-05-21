@@ -18,7 +18,7 @@
     Updates performed by Nerdile: https://github.com/nerdile/convert-windowsimage
 
     Updated by Max Allen (AzureToTheMax) to account for PowerShell 7 and changes to .Net assemblies.
-    See article: 
+    See article: https://azuretothemax.net/2025/05/20/building-golden-images-for-hyper-v-lab-testing/
     Contact:    AzureToTheMax.Net, AzureToTheMax on Discord
     Updated:    5/20/25
     Website:    AzureToTheMax.Net
