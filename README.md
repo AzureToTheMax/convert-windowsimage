@@ -10,7 +10,7 @@ This code is owned by Microsoft and licensed under the MS-LPL.  See the LICENSE 
 - .Net classes have changed vastly since originally written. The corrected/update names of the classes and packages needed to be located, then code changed to download them as needed.
 
 ## See Article:
-
+https://azuretothemax.net/2025/05/20/building-golden-images-for-hyper-v-lab-testing/
 
 ## For Use Instructions:
 Look at the code itself. There are many comments from the original authors explaining how to use the script.
